@@ -4,7 +4,7 @@
 
 ASM=nasm
 ASMFLAGS=-f elf
-DEBUGFLAGS=-g -F stabs
+DEBUGFLAGS=-g -F dwarf
 LD=ld
 LDFLAGS=-m elf_i386
 TARGET=main
