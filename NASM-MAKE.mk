@@ -1,13 +1,13 @@
 # Makefile for NASM programs
-# v1.0
+# v1.1
 # Made by Maxime Chretien (MixLeNain)
 
+TARGET=main
 ASM=nasm
 ASMFLAGS=-f elf
-DEBUGFLAGS=-g -F dwarf
+DEBUGFLAGS=-g -F dwarf -l $(TARGET).lst
 LD=ld
 LDFLAGS=-m elf_i386
-TARGET=main
 SRC=$(wildcard *.asm)
 OBJ=$(SRC:.asm=.o)
 
