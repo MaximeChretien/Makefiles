@@ -1,5 +1,5 @@
 # Makefile for AVR microcontrollers using C
-# v1.2
+# v1.3
 # Made by Maxime Chretien (MixLeNain)
 
 # Device settings
@@ -16,11 +16,12 @@ UPLOADER=avrdude -b $(BAUD) -c $(PROGRAMMER) -P $(PORT) -p $(DEVICE)
 # Build settings
 CC=avr-gcc
 CFLAGS=-Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
+DEPFLAGS=-MMD
 TARGET=main.hex
 ELF=$(patsubst %.hex, %.elf, $(TARGET))
-SRC=$(wildcard *.c)
-OBJ=$(SRC:.c=.o)
-DEPS=$(wildcard *.h)
+SRCS=$(wildcard *.c)
+OBJS=$(SRCS:.c=.o)
+DEPS=$(OBJS:.o=.d)
 
 .PHONY: all install flash fuse disasm clean mrproper
 
@@ -38,17 +39,19 @@ $(TARGET) : $(ELF)
 	rm -f $(TARGET)
 	avr-objcopy -j .text -j .data -O ihex $(ELF) $(TARGET)
 
-$(ELF) : $(OBJ)
+$(ELF) : $(OBJS)
 	$(CC) -o $@ $^ $(CFLAGS)
 
-%.o:%.c $(DEPS)
-	$(CC) -o $@ -c $< $(CFLAGS)
+%.o:%.c
+	$(CC) -o $@ -c $< $(CFLAGS) $(DEPFLAGS)
 
 disasm:	$(ELF)
 	avr-objdump -d $<
 
 clean:
-	rm -f *.o core
+	rm -f *.o core *.d
 
 mrproper: clean
 	rm -f $(TARGET) $(ELF)
+
+-include $(DEPS)

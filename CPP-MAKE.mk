@@ -1,27 +1,31 @@
 # Makefile for C++ programs
-# v1.3
+# v1.4
 # Made by Maxime Chretien (MixLeNain)
 
 CXX=g++
 CXXFLAGS=-Wall -O -std=c++17
+LDFLAGS=
+DEPFLAGS=-MMD
 TARGET=main
-SRC=$(wildcard *.cpp)
-OBJ=$(SRC:.cpp=.o)
-DEPS=$(wildcard *.hpp)
+SRCS=$(wildcard *.cpp)
+OBJS=$(SRCS:.cpp=.o)
+DEPS=$(OBJS:.o=.d)
 LIBS=
 
 .PHONY: all clean mrproper
 
 all: $(TARGET)
 
-$(TARGET) : $(OBJ)
+$(TARGET) : $(OBJS)
 	$(CXX) -o $@ $^ $(CXXFLAGS) $(LDFLAGS) $(LIBS)
 
-%.o:%.cpp $(DEPS)
-	$(CXX) -o $@ -c $< $(CXXFLAGS) $(LIBS)
+%.o:%.cpp
+	$(CXX) -o $@ -c $< $(CXXFLAGS) $(DEPFLAGS) $(LIBS)
 
 clean:
-	rm -f *.o core
+	rm -f *.o core *.d
 
 mrproper: clean
 	rm -f $(TARGET)
+
+-include $(DEPS)

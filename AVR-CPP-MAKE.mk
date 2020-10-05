@@ -1,5 +1,5 @@
 # Makefile for AVR microcontrollers using C++
-# v1.1
+# v1.2
 # Made by Maxime Chretien (MixLeNain)
 
 # Device settings
@@ -14,13 +14,14 @@ PORT=/dev/ttyACM0
 UPLOADER=avrdude -b $(BAUD) -c $(PROGRAMMER) -P $(PORT) -p $(DEVICE)
 
 # Build settings
-CC=avr-g++
-CFLAGS=-Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
+CXX=avr-g++
+CXXFLAGS=-Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
+DEPFLAGS=-MMD
 TARGET=main.hex
 ELF=$(patsubst %.hex, %.elf, $(TARGET))
-SRC=$(wildcard *.cpp)
-OBJ=$(SRC:.cpp=.o)
-DEPS=$(wildcard *.hpp)
+SRCS=$(wildcard *.cpp)
+OBJS=$(SRCS:.cpp=.o)
+DEPS=$(OBJS:.o:.d)
 
 .PHONY: all install flash fuse disasm clean mrproper
 
@@ -38,17 +39,19 @@ $(TARGET) : $(ELF)
 	rm -f $(TARGET)
 	avr-objcopy -j .text -j .data -O ihex $(ELF) $(TARGET)
 
-$(ELF) : $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+$(ELF) : $(OBJS)
+	$(CXX) -o $@ $^ $(CXXFLAGS)
 
-%.o:%.cpp $(DEPS)
-	$(CC) -o $@ -c $< $(CFLAGS)
+%.o:%.cpp
+	$(CXX) -o $@ -c $< $(CXXFLAGS) $(DEPFLAGS)
 
 disasm:	$(ELF)
 	avr-objdump -d $<
 
 clean:
-	rm -f *.o core
+	rm -f *.o core *.d
 
 mrproper: clean
 	rm -f $(TARGET) $(ELF)
+
+-include $(DEPS)

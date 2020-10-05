@@ -1,27 +1,31 @@
 # Makefile for C programs
-# v1.2
+# v1.3
 # Made by Maxime Chretien (MixLeNain)
 
 CC=gcc
 CFLAGS=-Wall -O -std=c17
+LDFLAGS=
+DEPFLAGS=-MMD
 TARGET=main
-SRC=$(wildcard *.c)
-OBJ=$(SRC:.c=.o)
-DEPS=$(wildcard *.h)
+SRCS=$(wildcard *.c)
+OBJS=$(SRCS:.c=.o)
+DEPS=$(OBJS:.o=.d)
 LIBS=
 
 .PHONY: all clean mrproper
 
 all: $(TARGET)
 
-$(TARGET) : $(OBJ)
+$(TARGET) : $(OBJS)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS) $(LIBS)
 
-%.o:%.c $(DEPS)
-	$(CC) -o $@ -c $< $(CFLAGS) $(LIBS)
+%.o:%.c
+	$(CC) -o $@ -c $< $(CFLAGS) $(DEPFLAGS) $(LIBS)
 
 clean:
-	rm -f *.o core
+	rm -f *.o core *.d
 
 mrproper: clean
 	rm -f $(TARGET)
+
+-include $(DEPS)
