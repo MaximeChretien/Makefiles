@@ -16,6 +16,9 @@ LIBS=
 
 all: $(TARGET)
 
+exe: $(TARGET)
+	./$(TARGET)
+
 $(TARGET) : $(OBJS)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS) $(LIBS)
 
