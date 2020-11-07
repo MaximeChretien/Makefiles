@@ -5,7 +5,7 @@
 # Device settings
 DEVICE=atmega328p
 CLOCK=16000000
-FUSES=-U lfuse:w:0x5E:m -U hfuse:w:0xD9:m -U efuse:w:0xFF:m
+FUSES=-U lfuse:w:0xDE:m -U hfuse:w:0xD9:m -U efuse:w:0xFF:m
 
 # Programmer settings
 BAUD=19200
